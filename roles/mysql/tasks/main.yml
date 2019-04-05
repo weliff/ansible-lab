@@ -1,0 +1,32 @@
+---
+- name: Instala depedencias do sistema operacional
+  apt:
+    name: [mysql-server-5.6, python-mysqldb]
+    state: latest
+  become: true
+
+- name: Cria banco de dados
+  mysql_db:
+    name: "{{ wp_db_name }}"
+    login_user: root
+    state: present
+
+- name: Cria usuário do banco de dados
+  mysql_user:
+    name: "{{ wp_username }}"
+    password: "{{ wp_user_password }}"
+    priv: "{{ wp_db_name }}.*:ALL"
+    state: present
+    login_user: root
+    host: "{{ item }}"
+  with_items:
+    - 'localhost'
+    - '127.0.0.1'
+    - "{{ wp_host_ip }}"
+
+- name: Configura MySQL para aceitar conexões remotas
+  replace:
+    path: /etc/mysql/my.cnf
+    regexp: 127.0.0.1
+    replace: 0.0.0.0
+  become: yes

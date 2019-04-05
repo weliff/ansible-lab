@@ -1,0 +1,3 @@
+---
+wp_db_name:
+  - nome_default_se_nao_informado_no_group_vars
